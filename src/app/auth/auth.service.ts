@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 interface UserNameAvailableResponse {
   available: boolean;
@@ -20,6 +22,11 @@ interface SignupResponse {
 })
 export class AuthService {
   rootUrl = 'https://api.angular-email.com';
+  // BehaviorSubject improves on regular Subject in that it can store a value AND
+  // deliver it immediately to new subscribers; ie, we can check it at any time
+  // to see if a user is signed in. '$' is a conventional but optional way of
+  // signifying something that is an observable or observable-like.
+  signedin$ = new BehaviorSubject(false);
 
   constructor(private http: HttpClient) { }
 
@@ -30,7 +37,12 @@ export class AuthService {
   }
 
   signup(credentials: SignupCredentials) {
-    return this.http.post<SignupResponse>(this.rootUrl + '/auth/signup', credentials);
+    return this.http.post<SignupResponse>(this.rootUrl + '/auth/signup', credentials
+    ).pipe(
+      tap(() => { // If err in signing up, this never runs
+        this.signedin$.next(true);
+      })
+    )
   }
 
 }
