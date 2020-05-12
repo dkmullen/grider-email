@@ -45,4 +45,13 @@ export class AuthService {
     )
   }
 
+  checkAuth() {
+    return this.http.get(`${this.rootUrl}/auth/signedin`)
+    .pipe(
+      tap((res) => {
+        console.log(res)
+      })
+    )
+  }
+
 }
