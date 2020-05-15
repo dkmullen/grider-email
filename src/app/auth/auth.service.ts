@@ -13,8 +13,18 @@ interface SignupCredentials {
   passwordConfirmation: string
 }
 
+interface SigninCredentials {
+  username: string,
+  password: string
+}
+
 interface SignupResponse {
   credentials: string;
+}
+
+interface SignedInResponse {
+  authenticated: boolean;
+  username: string;
 }
 
 @Injectable({
@@ -46,12 +56,30 @@ export class AuthService {
   }
 
   checkAuth() {
-    return this.http.get(`${this.rootUrl}/auth/signedin`)
+    return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedin`)
     .pipe(
-      tap((res) => {
-        console.log(res)
+      tap(({ authenticated }) => {
+        this.signedin$.next(authenticated);
       })
     )
+  }
+
+  signout() {
+    return this.http.post(`${this.rootUrl}/auth/signout`, {}) // post req always needs a body, even if empty
+      .pipe(
+        tap(() => {
+          this.signedin$.next(false);
+        })
+      )
+  }
+
+  signin(credentials: SigninCredentials) {
+    return this.http.post(`${this.rootUrl}/auth/signin`, credentials)
+      .pipe(
+        tap(() => { // err skips tap, so this won't run if err
+          this.signedin$.next(true);
+        })
+      )
   }
 
 }
