@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service'; 
 
 @Component({
@@ -22,7 +23,7 @@ export class SigninComponent implements OnInit {
     ]),
   });
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
   }
@@ -35,7 +36,7 @@ export class SigninComponent implements OnInit {
     this.authService.signin(this.authForm.value).subscribe({
       // usually I pass a function into subscribe, but can also pass an object with functions to run
       next: () => {
-
+        this.router.navigateByUrl('/inbox');
       }, 
       error: ({ error }) => { // this api has an err property called 'error' so here we are destructuring it out
         if (error.username || error.password) {

@@ -36,7 +36,7 @@ export class AuthService {
   // deliver it immediately to new subscribers; ie, we can check it at any time
   // to see if a user is signed in. '$' is a conventional but optional way of
   // signifying something that is an observable or observable-like.
-  signedin$ = new BehaviorSubject(false);
+  signedin$ = new BehaviorSubject(null); // 'null' to indicate that the auth status hasn't been checked yet
 
   constructor(private http: HttpClient) { }
 
