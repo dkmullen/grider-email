@@ -11,5 +11,4 @@ export class EmailCreateComponent implements OnInit {
 
   ngOnInit() {
   }
-
 }
