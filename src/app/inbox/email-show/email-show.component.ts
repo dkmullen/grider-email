@@ -13,8 +13,8 @@ export class EmailShowComponent implements OnInit {
   email: Email;
 
   constructor(private route: ActivatedRoute, private emailService: EmailService) {
-    this.route.data.subscribe(data => {
-      console.log(data)
+    this.route.data.subscribe(({ email }) => {
+      this.email = email;
     })
    }
 
