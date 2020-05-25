@@ -19,11 +19,15 @@ interface SigninCredentials {
 }
 
 interface SignupResponse {
-  credentials: string;
+  username: string;
 }
 
 interface SignedInResponse {
   authenticated: boolean;
+  username: string;
+}
+
+interface SingInResponse {
   username: string;
 }
 
@@ -37,6 +41,7 @@ export class AuthService {
   // to see if a user is signed in. '$' is a conventional but optional way of
   // signifying something that is an observable or observable-like.
   signedin$ = new BehaviorSubject(null); // 'null' to indicate that the auth status hasn't been checked yet
+  username = '';
 
   constructor(private http: HttpClient) { }
 
@@ -49,8 +54,9 @@ export class AuthService {
   signup(credentials: SignupCredentials) {
     return this.http.post<SignupResponse>(this.rootUrl + '/auth/signup', credentials
     ).pipe(
-      tap(() => { // If err in signing up, this never runs
+      tap(({ username }) => { // If err in signing up, this never runs
         this.signedin$.next(true);
+        this.username = username;
       })
     )
   }
@@ -58,8 +64,9 @@ export class AuthService {
   checkAuth() {
     return this.http.get<SignedInResponse>(`${this.rootUrl}/auth/signedin`)
     .pipe(
-      tap(({ authenticated }) => {
+      tap(({ authenticated, username }) => {
         this.signedin$.next(authenticated);
+        this.username = username;
       })
     )
   }
@@ -74,10 +81,11 @@ export class AuthService {
   }
 
   signin(credentials: SigninCredentials) {
-    return this.http.post(`${this.rootUrl}/auth/signin`, credentials)
+    return this.http.post<SingInResponse>(`${this.rootUrl}/auth/signin`, credentials)
       .pipe(
-        tap(() => { // err skips tap, so this won't run if err
+        tap(({ username }) => { // err skips tap, so this won't run if err
           this.signedin$.next(true);
+          this.username = username;
         })
       )
   }
